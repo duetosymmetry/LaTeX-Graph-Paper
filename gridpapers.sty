@@ -209,6 +209,19 @@
   \expandafter\@setkeyhelper\expandafter{\GPOpt@integerboxes}{integerboxes}
 \fi
 
+%% Here is a utility math function we will use later
+%% The interface is:
+%% \GP@lengthtointegermultiple
+%%   {biglength}
+%%   {boxlength}
+%% This macro will set \GP@resultlength to an integer multiple of
+%% boxlength.  That integer multiple is based on either floor, ceil,
+%% or round, based on the value of \GP@integerboxcmd
+\newcommand{\GP@lengthtointegermultiple}[2]{%
+  \pgfmathsetmacro{\GP@tmpBlocks}{\GP@integerboxcmd((#1)/(#2))}
+  \pgfmathsetlengthmacro{\GP@resultlength}{\GP@tmpBlocks*(#2)}
+}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% The size parameter -- different meanings for different patterns
 %% Will be reset by pattern code
@@ -604,6 +617,10 @@
 }
 
 %% Use the passed package option to set the above key
+%% This will set key patterndefaultfullness, and set the macros
+%% \GP@patterndefaultgeometry, \GP@patterndefaultsize,
+%% \GP@tilewidth, \GP@tileheight,
+%% \GP@innerpatterncode
 \expandafter\@setkeyhelper\expandafter{\GPOpt@pattern}{pattern}
 
 %% Determine whether or not to (re)set fullpage vs textarea
@@ -620,17 +637,6 @@
   \fi
 \fi
 
-%% Determine whether or not to fiddle with the page geometry
-\ifGP@geometrypreviouslyloaded
-%% Respect their previous choice
-\PackageWarning{gridpapers}{'geometry' package was previously loaded, will not use pattern defaults.}
-\else
-  %% Use the pattern's defaults,
-  \expandafter\geometry\expandafter{\GP@patterndefaultgeometry}
-  %% And then override with any more specific settings passed by the user
-  \expandafter\geometry\expandafter{\GPOpt@geometry}
-\fi
-
 %% Determine the correct pattern length
 \ifx\GPOpt@patternsize\@empty
   % Use the pattern's preferred length
@@ -640,9 +646,40 @@
   \renewcommand{\GP@patternsize}{\GPOpt@patternsize}
 \fi
 
+%% Determine whether or not to fiddle with the page geometry
+\ifGP@geometrypreviouslyloaded
+%% Respect their previous choice
+\PackageWarning{gridpapers}{'geometry' package was previously loaded,
+  will not use pattern defaults or round to integer number of boxes.}
+\else
+  %% Use the pattern's defaults,
+  \expandafter\geometry\expandafter{\GP@patterndefaultgeometry}
+  %% And then override with any more specific settings passed by the user
+  \expandafter\geometry\expandafter{\GPOpt@geometry}
 
-%% Margin code goes here
-
+  %% Now see if we should re-jigger the margins based on integerboxes
+  \ifGP@fullpage
+    %% Do we adjust page size if fullpage?
+  \else
+    \ifx\GPOpt@integerboxes\@empty
+    \else
+      \expandafter\ifx\GP@tilewidth\@empty
+      \else
+        %% Compute and adjust horizontal margins
+        \GP@lengthtointegermultiple{\textwidth}{\GP@tilewidth}
+        \PackageWarning{gridpapers}{New textwidth will be \GP@resultlength}
+        \expandafter\geometry{textwidth=\GP@resultlength}
+      \fi
+      \expandafter\ifx\GP@tileheight\@empty
+      \else
+        %% Compute and adjust vertical margins
+        \GP@lengthtointegermultiple{\textheight}{\GP@tileheight}
+        \PackageWarning{gridpapers}{New textheight will be \GP@resultlength}
+        \expandafter\geometry{textheight=\GP@resultlength}
+      \fi
+    \fi
+  \fi
+\fi
 
 %% Now that everything has been set up, we can finally define the
 %% patterns with the correct lengths.
