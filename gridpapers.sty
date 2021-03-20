@@ -74,6 +74,7 @@
 \DeclareVoidOption{fullpage}{\GP@fullpagetrue}
 \DeclareVoidOption{textarea}{\GP@textareatrue}
 
+\DeclareStringOption{integerboxes}[inside]
 \DeclareStringOption{geometry}
 
 \ProcessKeyvalOptions*
@@ -178,6 +179,34 @@
 \ifx\GPOpt@bgcolor\@empty
 \else
   \colorlet{bgcolor}{\GPOpt@bgcolor}
+\fi
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Parameter integerboxes -- whether or not to set margins so we get
+%% an integer number of box repetitions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% This macro will be reset to be one of the math commands
+\newcommand{\GP@integerboxcmd}{}
+
+\define@choicekey*{GP}{integerboxes}[\val\nr]%
+  %% Allowed values for integerboxes:
+  {inside, outside, nearest}{%
+  \ifcase\nr\relax
+    %% inside
+    \renewcommand{\GP@integerboxcmd}{floor}
+  \or
+    %% outside
+    \renewcommand{\GP@integerboxcmd}{ceil}
+  \or
+    %% nearest
+    \renewcommand{\GP@integerboxcmd}{round}
+  \fi
+}
+
+%% Check valid input and set based on user input
+\ifx\GPOpt@integerboxes\@empty
+\else
+  \expandafter\@setkeyhelper\expandafter{\GPOpt@integerboxes}{integerboxes}
 \fi
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
