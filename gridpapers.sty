@@ -402,6 +402,8 @@
 \define@boolkey{GP}{patterndefaultfullness}{}
 \newcommand{\GP@patterndefaultgeometry}{}
 \newcommand{\GP@patterndefaultsize}{}
+\newcommand{\GP@tilewidth}{}
+\newcommand{\GP@tileheight}{}
 
 %% Pattern-definer-helper
 %% The interface is:
@@ -409,12 +411,19 @@
 %%   {<true for default fullpage, false for default textarea>}
 %%   {<default geometry config>}
 %%   {<default pattern size>}  %% NOTE, not tile length
+%%   {<code to find tile width>}   %% Can refer to \GP@patternsize
+%%   {<code to find tile height>}  %% Can refer to \GP@patternsize
 %%   {<contents of inner pattern code>}
-\newcommand{\GP@setpattern}[4]{%
+%%
+%% For tile width and tile height, empty means any length (for
+%% example, for ruled -- only change vertical margins, not horizontal)
+\newcommand{\GP@setpattern}[6]{%
 \setkeys{GP}{patterndefaultfullness=#1}
 \renewcommand{\GP@patterndefaultgeometry}{#2}
 \renewcommand{\GP@patterndefaultsize}{#3}
-\renewcommand{\GP@innerpatterncode}{#4}
+\renewcommand{\GP@tilewidth}{#4}
+\renewcommand{\GP@tileheight}{#5}
+\renewcommand{\GP@innerpatterncode}{#6}
 }
 
 \define@choicekey*{GP}{pattern}[\val\nr]%
@@ -425,7 +434,13 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Quadrille, ten squares per inch.
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    \GP@setpattern{false}{letterpaper, margin=0.2in}{0.1in}{%
+    \GP@setpattern
+    {false}%% Default fullness
+    {letterpaper, margin=0.2in}%% Default geometry
+    {0.1in}%% Default pattern size
+    {\GP@patternsize}%% Tile width code
+    {\GP@patternsize}%% Tile height code
+    {%
 %% Draw a grid with 10 squares per inch.
 \draw[style=minorgrid, shift={(a)}] (0,0) grid [step=\GP@patternsize] (b);
 %%
@@ -437,7 +452,13 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Quadrille, eight squares per inch.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    \GP@setpattern{false}{letterpaper, margin=0.1875in}{0.125in}{%
+    \GP@setpattern
+    {false}%% Default fullness
+    {letterpaper, margin=0.1875in}%% Default geometry
+    {0.125in}%% Default pattern size
+    {\GP@patternsize}%% Tile width code
+    {\GP@patternsize}%% Tile height code
+    {%
 %% Draw a grid with 10 squares per inch.
 \draw[style=minorgrid, shift={(a)}] (0,0) grid [step=\GP@patternsize] (b);
 %%
@@ -450,7 +471,13 @@
 %% Graph paper, eight squares per inch with a major grid
 %% every half-inch.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    \GP@setpattern{false}{letterpaper, margin=0.25in}{0.125in}{%
+    \GP@setpattern
+    {false}%% Default fullness
+    {letterpaper, margin=0.25in}%% Default geometry
+    {0.125in}%% Default pattern size
+    {4*\GP@patternsize}%% Tile width code
+    {4*\GP@patternsize}%% Tile height code
+    {%
 %% Draw a grid with 10 squares per inch.
 \draw[style=minorgrid, shift={(a)}] (0,0) grid [step=\GP@patternsize] (b);
 %%
@@ -466,7 +493,13 @@
 %% Slightly modified version of code added by Leo
 %% Stein (@duetosymmetry).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    \GP@setpattern{true}{}{0.1in}{%
+    \GP@setpattern
+    {true}%% Default fullness
+    {}%% Default geometry
+    {0.1in}%% Default pattern size
+    {\GP@patternsize}%% Tile width code
+    {\GP@patternsize}%% Tile height code
+    {%
     \fill [pattern=dotgrid,pattern color=minorcolor] (a) rectangle (b);
     }
   \or
@@ -474,7 +507,13 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Hex grid
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    \GP@setpattern{true}{}{0.1666in}{%
+    \GP@setpattern
+    {true}%% Default fullness
+    {}%% Default geometry
+    {0.1666in}%% Default pattern size
+    {3*\GP@patternsize}%% Tile width code
+    {0.866025*2*\GP@patternsize}%% Tile height code
+    {%
     \fill [pattern=hexagons,pattern color=minorcolor] (a) rectangle (b);
     }
   \or
@@ -482,7 +521,13 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Triangle grid, adjust triangle size in the preamble
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    \GP@setpattern{true}{}{0.25in}{%
+    \GP@setpattern
+    {true}%% Default fullness
+    {}%% Default geometry
+    {0.25in}%% Default pattern size
+    {\GP@patternsize}%% Tile width code
+    {2*0.8660254*\GP@patternsize}%% Tile height code
+    {%
       \fill [pattern=triangles,pattern color=minorcolor] (a) rectangle (b);
     }
   \or
@@ -490,7 +535,13 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Isometric grid
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    \GP@setpattern{true}{}{0.25in}{%
+    \GP@setpattern
+    {true}%% Default fullness
+    {}%% Default geometry
+    {0.25in}%% Default pattern size
+    {2*0.8660254*\GP@patternsize}%% Tile width code
+    {\GP@patternsize}%% Tile height code
+    {%
       \fill [pattern=isometric, pattern color=minorcolor] (a) rectangle (b);
     }
   \or
@@ -498,7 +549,13 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% A grid with light cones.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    \GP@setpattern{false}{letterpaper, margin=.125in}{0.25in}{%
+    \GP@setpattern
+    {false}%% Default fullness
+    {letterpaper, margin=.125in}%% Default geometry
+    {0.25in}%% Default pattern size
+    {\GP@patternsize}%% Tile width code
+    {\GP@patternsize}%% Tile height code
+    {%
 %% Draw a grid with 4 squares per inch.
 \draw[style=minorgrid, shift={(a)}] (0,0) coordinate grid [step=\GP@patternsize] (b);
 %%
@@ -510,7 +567,13 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Ruled page with bold lines every 0.2in or 0.25in
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    \GP@setpattern{false}{letterpaper, body={8in,10.8in}}{0.2in}{%
+    \GP@setpattern
+    {false}%% Default fullness
+    {letterpaper, body={8in,10.8in}}%% Default geometry
+    {0.2in}%% Default pattern size
+    {}%% Tile width code
+    {\GP@patternsize}%% Tile height code
+    {%
 %% Draw a ruled page with lines every 0.2in
 \draw[style=majorgrid, shift={(a)}] (0,0) grid [ystep=\GP@patternsize, xstep=\paperwidth] (b);
 %% Draw a frame around the grid.
@@ -522,7 +585,13 @@
 %% Ruled page with bold lines every 0.25in and light lines
 %% every 0.125 in.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    \GP@setpattern{false}{letterpaper, margin=.25in}{0.125in}{%
+    \GP@setpattern
+    {false}%% Default fullness
+    {letterpaper, margin=.25in}%% Default geometry
+    {0.125in}%% Default pattern size
+    {}%% Tile width code
+    {2*\GP@patternsize}%% Tile height code
+    {%
 %% Draw a ruled pattern with thin lines every 0.125 in and bold lines every 0.25 in.
 \draw[style=minorgrid, shift={(a)}] (0,0) grid [ystep=\GP@patternsize, xstep=\paperwidth] (b);
 %%
@@ -570,6 +639,10 @@
   % Override with the user's choice
   \renewcommand{\GP@patternsize}{\GPOpt@patternsize}
 \fi
+
+
+%% Margin code goes here
+
 
 %% Now that everything has been set up, we can finally define the
 %% patterns with the correct lengths.
